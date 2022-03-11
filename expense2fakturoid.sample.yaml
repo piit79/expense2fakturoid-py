@@ -1,0 +1,11 @@
+slug: 'yourcompany1'
+email: 'info@company.tld'
+api_key: '...'
+cpost:
+  email: 'info@cpost.cz'                 # Override the default Fakturoid subject e-mail
+  payment_method: 'card'                 # Override the default payment method. Valid values: bank, cash, cod, card
+  default_service: 'Doporučená zásilka'  # Override the default service (if not found in the list of services)
+  pay: True                              # Set to False to disable marking expense as paid
+  bank_account_id: 12345                 # Bank account id for expense payment (default: Fakturoid default if empty)
+packeta:
+  email: 'info@zasilkovna.cz'            # Override the default Fakturoid subject e-mail
