@@ -8,10 +8,12 @@ If you use [Fakturoid](https://fakturoid.cz) and
 `expense2fakturoid-py` allows you to automatically import these documents into
 Fakturoid by parsing the PDF file.
 
-## This is a work in progress
+## Disclaimer
 
-While it seems to work well for the few invoices/receipts I tested, please keep in mind 
-this is still a work in progress. If you encounter any problems, please file a GitHub issue! 
+**This is a work in progress.** While it seems to work well for the few invoices/receipts
+I tested with, please consider this a beta-quality software. 
+
+If you encounter any problems, please file a [GitHub issue](https://github.com/piit79/expense2fakturoid-py/issues). 
 
 ## Getting started
 
@@ -24,22 +26,35 @@ this is still a work in progress. If you encounter any problems, please file a G
     git clone https://github.com/piit79/expense2fakturoid-py.git
     cd expense2fakturoid-py
 
-    # Create the Python 3 virtualenv
+    # Create the Python 3 virtualenv and install dependencies
     python3 -m venv venv
     venv/bin/pip install -r requirements.txt
 
-    # Copy the configuration file
+    # Install the expense2fakturoid module
+    venv/bin/python setup.py install
+
+    # Copy the sample configuration file
     cp expense2fakturoid.sample.yaml expense2fakturoid.yaml
 
-Then edit the configuration file `expense2fakturoid.yaml` - the only required entries
-are `slug`, `email` and `api_key`.
+## Configuration
+
+The path to the configuration file `expense2fakturoid.yaml` can be specified on the command
+line (`--config/-c`). If it's not, `expense2fakturoid` will look in the current directory,
+or in the operating system configuration directory:
+ * `$XDG_CONFIG_HOME` or  `~/.config` on Linux
+ * `C:\Users\<username>\AppData` on Windows 
+
+The only required config entries are `slug`, `email` and `api_key`. All entries are described 
+in the sample configuration file `expense2fakturoid.sample.yaml`.
 
 ## Running
 
-    venv/bin/python3 expense2fakturoid.py --supplier packeta invoice.pdf
+    venv/bin/expense2fakturoid --supplier packeta invoice.pdf
 
-This will parse the PDF invoice and create the complete expense entry in Fakturoid
-including the PDF attachment.
+This will parse the PDF invoice and create the complete expense entry in Fakturoid including 
+the PDF attachment.
+
+Please note the supplier contact must already exist in Fakturoid.
 
 ## How it works
 
@@ -60,6 +75,5 @@ including the PDF attachment.
 
 ## TODO
 
- * Create a `setup.py` file for proper installation
  * Add support for supplier auto-detection
  * Add support for more suppliers (AliExpress, JLCPCB are ones I use quite often)
