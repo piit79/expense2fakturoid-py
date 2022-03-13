@@ -1,0 +1,108 @@
+#!python
+
+import argparse
+import os
+import sys
+import yaml
+from typing import Any, Dict
+
+from requests.exceptions import HTTPError
+
+from expense2fakturoid import InvalidConfigException, Expense2Fakturoid, ParseError, Suppliers
+
+
+CONFIG_FILENAME = 'expense2fakturoid.yaml'
+
+
+class ConfigNotFoundError(FileNotFoundError):
+    """Raised when the configuration file could not be found"""
+
+
+def get_args():
+    """
+    Parse and return the command-line arguments
+    """
+    parser = argparse.ArgumentParser(description='Parse supplier invoice and create it in Fakturoid')
+    parser.add_argument('--config', '-c', help='config file path')
+    parser.add_argument('--supplier', '-s', help='supplier type', required=True, choices=Suppliers.get_valid_codes())
+    parser.add_argument('filename', help='supplier invoice file name')
+
+    return parser.parse_args()
+
+
+def find_config() -> str:
+    """
+    Find the configuration file and return the file path
+
+    :raises: ConfigNotFoundError
+    """
+    xdg_config_home = os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
+    app_data = os.environ.get('APPDATA')
+    config_locations = [
+        CONFIG_FILENAME,
+        os.path.join(app_data or xdg_config_home, CONFIG_FILENAME)
+    ]
+
+    for f in config_locations:
+        if os.path.isfile(f):
+            return f
+
+    raise ConfigNotFoundError()
+
+
+def get_config(config_file) -> Dict[str, Any]:
+    """
+    Return the configuration file data
+    """
+    with open(config_file, 'r') as f:
+        return yaml.load(f, yaml.SafeLoader)
+
+
+def validate_config(config_data: Dict[str, Any]):
+    """
+    :rases: InvalidConfigException
+    """
+    required_keys = ['slug', 'email', 'api_key']
+    if missing := [key for key in required_keys if not config_data.get(key)]:
+        raise InvalidConfigException('Required configuration key(s) not set: ' + ', '.join(missing))
+
+
+def main():
+    args = get_args()
+    config_file = None
+    try:
+        config_file = args.config or find_config()
+        config = get_config(config_file)
+        validate_config(config)
+    except ConfigNotFoundError:
+        print(f'Config file not found, please specify --config/-c')
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f'Specified config file {config_file} not found')
+        sys.exit(1)
+    except IOError as e:
+        print(f'Cannot open config file: {e}')
+        sys.exit(2)
+    except InvalidConfigException as e:
+        print(e)
+        sys.exit(3)
+
+    e2fa = Expense2Fakturoid(config, args.supplier, args.filename)
+    try:
+        url = e2fa.run()
+    except HTTPError as e:
+        print(f'Error connecting to Fakturoid: {e}')
+        sys.exit(4)
+    except (FileNotFoundError, IOError) as e:
+        print(f'Cannot open input file: {e}')
+        print(repr(e))
+        sys.exit(5)
+    except (InvalidConfigException, ParseError) as e:
+        print(e)
+        sys.exit(6)
+
+    print(f'Expense imported successfully: {url}')
+
+
+if __name__ == '__main__':
+    main()
