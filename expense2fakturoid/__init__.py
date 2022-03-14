@@ -36,13 +36,35 @@ class Suppliers:
 class Expense2Fakturoid:
     APP_NAME = 'Expense2Fakturoid'
 
-    def __init__(self, config: Dict[str, Any], supplier_code: str, filename: str):
+    def __init__(
+            self,
+            config: Dict[str, Any],
+            supplier_code: str,
+            filename: str,
+            bank_account_id: Optional[int] = None
+    ):
         self.fa = Fakturoid(config.get('slug'), config.get('email'), config.get('api_key'), self.APP_NAME)
         self.config = config
         self.supplier_code = supplier_code
         self.filename = filename
+        self.bank_account_id = bank_account_id
         self.supplier_config = self.config.get(self.supplier_code, {})
+        self.validate_supplier_config()
         self.parser = None
+
+    def validate_supplier_config(self):
+        """
+        Validate the supplier config
+
+        :raises: InvalidConfigException
+        """
+        if (bank_account_id := self.supplier_config.get('bank_account_id')) is not None:
+            try:
+                self.supplier_config['bank_account_id'] = int(bank_account_id)
+            except ValueError:
+                raise InvalidConfigException(
+                    f'Invalid `bank_account_id` specified in {self.supplier_code} config: {bank_account_id}'
+                )
 
     def find_subject(self, email: str) -> Optional[Subject]:
         """
@@ -59,12 +81,18 @@ class Expense2Fakturoid:
 
         return expense
 
+    def get_bank_account_id(self) -> Optional[int]:
+        """
+        Return the bank account id to use for the payment entry
+        """
+        return self.bank_account_id or self.supplier_config.get('bank_account_id')
+
     def mark_expense_paid(self, expense, paid_on):
         """
         Mark the expense as paid in Fakturoid
         """
         self.fa.fire_expense_event(
-            expense.id, 'pay', paid_on=paid_on, bank_account_id=self.supplier_config.get('bank_account_id')
+            expense.id, 'pay', paid_on=paid_on, bank_account_id=self.get_bank_account_id()
         )
 
     def run(self) -> str:

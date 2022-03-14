@@ -25,6 +25,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Parse supplier invoice and create it in Fakturoid')
     parser.add_argument('--config', '-c', help='config file path')
     parser.add_argument('--supplier', '-s', help='supplier type', required=True, choices=Suppliers.get_valid_codes())
+    parser.add_argument('--bank-account-id', '-b', help='bank account id', type=int)
     parser.add_argument('filename', help='supplier invoice file name')
 
     return parser.parse_args()
@@ -87,8 +88,8 @@ def main():
         print(e)
         sys.exit(3)
 
-    e2fa = Expense2Fakturoid(config, args.supplier, args.filename)
     try:
+        e2fa = Expense2Fakturoid(config, args.supplier, args.filename)
         url = e2fa.run()
     except HTTPError as e:
         print(f'Error connecting to Fakturoid: {e}')
