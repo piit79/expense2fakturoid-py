@@ -34,6 +34,7 @@ class ParserCPost(ParserBase):
     SUPPLIER_CODE = 'cpost'
     DEFAULT_EMAIL = 'info@cpost.cz'
     DEFAULT_PAYMENT_METHOD = 'card'
+    PAY = True
 
     REGEXES_HEADER = [
         (r'POŠTA:\s+(?P<post_office>13003 Praha 33)\s+'
@@ -48,15 +49,11 @@ class ParserCPost(ParserBase):
     )
     REGEX_STOP = r'^\s*Celkem zásilek'
 
-    @property
-    def pay(self) -> bool:
-        """
-        Return True if the expense should be marked as paid
-        """
-        return self.supplier_config.get('pay', True)
-
     def get_service(self, service_code) -> str:
-        SERVICE_CODES.get(service_code, self.supplier_config.get('default_service') or SERVICE_DEFAULT)
+        """
+        Return the service name for the given service code
+        """
+        return SERVICE_CODES.get(service_code, self.supplier_config.get('default_service') or SERVICE_DEFAULT)
 
     def get_header(self, data: Dict[str, str]) -> Dict[str, Any]:
         """

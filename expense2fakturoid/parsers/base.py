@@ -13,13 +13,7 @@ class ParserBase(ABC):
     SUPPLIER_CODE: str = None
     DEFAULT_EMAIL: str = None
     DEFAULT_PAYMENT_METHOD = 'bank'
-
-    @property
-    def pay(self) -> bool:
-        """
-        Return True if the expense should be marked as paid
-        """
-        return False
+    PAY = False
 
     def __init__(self, filename, supplier_config: Optional[Dict]):
         self.filename = filename
@@ -28,7 +22,17 @@ class ParserBase(ABC):
         self.invoice = {}
         self.read_file()
 
+    @property
+    def pay(self) -> bool:
+        """
+        Return True if the expense should be marked as paid
+        """
+        return self.supplier_config.get('pay', self.PAY)
+
     def get_supplier_email(self) -> str:
+        """
+        Return the e-mail of the supplier contact in Fakturoid
+        """
         return self.supplier_config.get('email', self.DEFAULT_EMAIL)
 
     def read_file(self):
