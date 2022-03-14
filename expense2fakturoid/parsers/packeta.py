@@ -60,6 +60,7 @@ class ParserPacketa(ParserBase):
     def parse(self) -> Dict[str, Any]:
         """
         Parse the invoice/receipt and return the data
+
         :raises: ParseError
         """
         data = {}
