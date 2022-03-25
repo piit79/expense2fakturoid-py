@@ -37,7 +37,7 @@ class ParserCPost(ParserBase):
     PAY = True
 
     REGEXES_HEADER = [
-        (r'POŠTA:\s+(?P<post_office>13003 Praha 33)\s+'
+        (r'POŠTA:\s+(?P<post_office>.+?)\s+'
          r'DATUM PODÁNÍ:\s+(?P<issue_day>\d+)\.(?P<issue_month>\d{1,2})\.(?P<issue_year>\d{4})'),
         r'Kontakty\s+Hmotnost',
     ]
