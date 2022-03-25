@@ -117,6 +117,6 @@ class Expense2Fakturoid:
         expense = self.create_expense(data)
 
         if parser.pay:
-            self.mark_expense_paid(expense, paid_on=data['issued_on'])
+            self.mark_expense_paid(expense, paid_on=data['due_on'])
 
         return expense.html_url
