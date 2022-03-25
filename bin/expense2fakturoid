@@ -93,7 +93,7 @@ def main():
     try:
         for filename in args.filenames:
             print(f'Importing {filename}')
-            e2fa = Expense2Fakturoid(config, args.supplier, filename)
+            e2fa = Expense2Fakturoid(config, args.supplier, filename, args.bank_account_id)
             url = e2fa.run()
             print(f'Expense imported successfully: {url}')
     except HTTPError as e:
