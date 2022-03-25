@@ -128,7 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Sample invoice files
+samples/
+
 # Local configuration file
 expense2fakturoid.yaml
-*.pdf
-*.txt
