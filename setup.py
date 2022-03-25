@@ -1,6 +1,9 @@
 from setuptools import setup
 
 
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
 long_description = """
 Allows creating complete expense entries in the on-line invoicing system Fakturoid <https://www.fakturoid.cz/>
 by parsing the PDF invoices/bills.
@@ -18,7 +21,7 @@ setup(
     long_description=long_description,
     platforms='any',
     keywords=['fakturoid', 'expense', 'import'],
-    install_requires=['pdftotext', 'fakturoid'],
+    install_requires=requirements,
     # tests_require=['mock'],  # No tests yet, sorry
     # test_suite="tests",
     scripts=['bin/expense2fakturoid'],
