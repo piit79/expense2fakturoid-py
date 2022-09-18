@@ -52,6 +52,7 @@ class Expense2Fakturoid:
         self.validate_supplier_config()
         self.subject = None
         self.parser = None
+        self.self_apply_vat = None
 
     def validate_supplier_config(self):
         """
@@ -79,6 +80,8 @@ class Expense2Fakturoid:
         """
         lines = self.get_lines(data.pop('lines'))
         data['subject_id'] = self.subject.id
+        if self.self_apply_vat:
+            data['transferred_tax_liability'] = True
 
         data['lines'] = [InvoiceLine(**line) for line in lines]
 
@@ -88,6 +91,11 @@ class Expense2Fakturoid:
         """
         Process and return expense line data
         """
+        vat_rate = self.config.get('vat_rate')
+        for line in lines:
+            if line['vat_rate'] == 0 and self.self_apply_vat:
+                line['vat_rate'] = vat_rate
+
         return lines
 
     def create_expense(self, data) -> Expense:
@@ -126,6 +134,8 @@ class Expense2Fakturoid:
         self.subject = self.find_subject(supplier_email)
         if not self.subject:  # Walrus operator not allowed here :/
             raise InvalidConfigException(f'Contact with e-mail {supplier_email} not found in Fakturoid')
+
+        self.self_apply_vat = self.config.get('vat_registered', False) and self.parser.FOREIGN
 
         parsed_data = self.parser.parse()
         data = self.get_expense_data(parsed_data)

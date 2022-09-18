@@ -12,6 +12,7 @@ class ParseError(Exception):
 class ParserBase(ABC):
     SUPPLIER_CODE: str = None
     DEFAULT_EMAIL: str = None
+    FOREIGN = False
     DEFAULT_PAYMENT_METHOD = 'bank'
     MARK_PAID = False
 

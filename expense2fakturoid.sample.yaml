@@ -1,6 +1,8 @@
 slug: 'yourcompany1'
 email: 'info@company.tld'
 api_key: '...'
+vat_registered: false                    # Set to true if you are VAT registered
+vat_rate: 21                             # VAT rate to apply in case of transferred tax liability
 cpost:
   email: 'info@cpost.cz'                 # Override the default Fakturoid subject e-mail
   payment_method: 'card'                 # Override the default payment method. Valid values: bank, cash, cod, card

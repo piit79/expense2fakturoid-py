@@ -66,6 +66,9 @@ def validate_config(config_data: Dict[str, Any]):
     :raises: InvalidConfigException
     """
     required_keys = ['slug', 'email', 'api_key']
+    if config_data.get('vat_registered'):
+        required_keys.append('vat_rate')
+
     if missing := [key for key in required_keys if not config_data.get(key)]:
         raise InvalidConfigException('Required configuration key(s) not set: ' + ', '.join(missing))
 
