@@ -34,7 +34,7 @@ class ParserCPost(ParserBase):
     SUPPLIER_CODE = 'cpost'
     DEFAULT_EMAIL = 'info@cpost.cz'
     DEFAULT_PAYMENT_METHOD = 'card'
-    PAY = True
+    MARK_PAID = True
 
     REGEXES_HEADER = [
         (r'POŠTA:\s+(?P<post_office>.+?)\s+'

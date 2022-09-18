@@ -13,7 +13,7 @@ class ParserBase(ABC):
     SUPPLIER_CODE: str = None
     DEFAULT_EMAIL: str = None
     DEFAULT_PAYMENT_METHOD = 'bank'
-    PAY = False
+    MARK_PAID = False
 
     def __init__(self, filename, supplier_config: Optional[Dict]):
         self.filename = filename
@@ -23,11 +23,11 @@ class ParserBase(ABC):
         self.read_file()
 
     @property
-    def pay(self) -> bool:
+    def mark_paid(self) -> bool:
         """
         Return True if the expense should be marked as paid
         """
-        return self.supplier_config.get('pay', self.PAY)
+        return self.supplier_config.get('mark_paid', self.MARK_PAID)
 
     def get_supplier_email(self) -> str:
         """
