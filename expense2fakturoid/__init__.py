@@ -50,6 +50,7 @@ class Expense2Fakturoid:
         self.bank_account_id = bank_account_id
         self.supplier_config = self.config.get(self.supplier_code, {})
         self.validate_supplier_config()
+        self.subject = None
         self.parser = None
 
     def validate_supplier_config(self):
@@ -71,6 +72,23 @@ class Expense2Fakturoid:
         Return the Fakturoid subject with the given email, or None if not found
         """
         return next((s for s in self.fa.subjects.search(email) if s.email == email), None)
+
+    def get_expense_data(self, data: Dict) -> Dict:
+        """
+        Process and return expense line data
+        """
+        lines = self.get_lines(data.pop('lines'))
+        data['subject_id'] = self.subject.id
+
+        data['lines'] = [InvoiceLine(**line) for line in lines]
+
+        return data
+
+    def get_lines(self, lines: List[Dict]) -> List[Dict]:
+        """
+        Process and return expense line data
+        """
+        return lines
 
     def create_expense(self, data) -> Expense:
         """
@@ -102,18 +120,15 @@ class Expense2Fakturoid:
         if not (parser_class := Suppliers.get_parser_class(self.supplier_code)):
             raise ValueError(f'Unknown supplier {self.supplier_code}')
 
-        parser = parser_class(self.filename, self.supplier_config)
+        self.parser = parser_class(self.filename, self.supplier_config)
 
-        supplier_email = parser.get_supplier_email()
-        if not (subject := self.find_subject(supplier_email)):
-            raise InvalidConfigException(f'Subject with e-mail {supplier_email} not found in Fakturoid')
+        supplier_email = self.parser.get_supplier_email()
+        self.subject = self.find_subject(supplier_email)
+        if not self.subject:  # Walrus operator not allowed here :/
+            raise InvalidConfigException(f'Contact with e-mail {supplier_email} not found in Fakturoid')
 
-        data = parser.parse()
-
-        lines = data.pop('lines')
-        data['subject_id'] = subject.id
-        data['lines'] = [InvoiceLine(**line) for line in lines]
-
+        parsed_data = self.parser.parse()
+        data = self.get_expense_data(parsed_data)
         expense = self.create_expense(data)
 
         if self.parser.mark_paid:
