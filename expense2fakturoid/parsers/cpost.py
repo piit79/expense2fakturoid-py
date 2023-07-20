@@ -1,7 +1,7 @@
 import re
 from datetime import date
 from itertools import cycle
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from .base import ParserBase, ParseError
 from .utils import decimal, quantity
@@ -48,6 +48,18 @@ class ParserCPost(ParserBase):
         r'^\s+(?P<customer_email>\S+@\S+)\s*$',
     )
     REGEX_STOP = r'^\s*Celkem zásilek'
+
+    recipient_name: str
+    recipient_email: str
+    tracking_number: str
+    posting_office: str
+
+    def __init__(self, filename, supplier_config: Optional[Dict] = None):
+        super().__init__(filename, supplier_config)
+        self.recipient_name = None
+        self.recipient_email = None
+        self.tracking_number = None
+        self.posting_office = None
 
     def get_service(self, service_code) -> str:
         """
@@ -129,6 +141,10 @@ class ParserCPost(ParserBase):
                         self.invoice['lines'].append(self.get_line(bill_line))
                         if 'private_note' not in self.invoice:
                             self.add_notes(data, bill_line)
+                            self.recipient_name = bill_line['customer_name']
+                            self.recipient_email = bill_line['customer_email']
+                            self.tracking_number = bill_line['tracking']
+                            self.posting_office = data['post_office']
                         bill_line = {}
                     regex = next(regexi)
                 elif re.search(self.REGEX_STOP, line):
