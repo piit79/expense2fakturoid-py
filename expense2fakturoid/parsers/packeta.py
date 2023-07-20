@@ -17,8 +17,8 @@ class ParserPacketa(ParserBase):
     SUPPLIER_CODE = 'packeta'
     DEFAULT_EMAIL = 'info@zasilkovna.cz'
     REGEXES_HEADER = [
-        r'FAKTURA - DAŇOVÝ DOKLAD č.\s+(?P<invoice_number>\d+)',
-        r'Variabilní symbol:\s+(?P<variable_symbol>\S+)',
+        r'(FAKTURA - DAŇOVÝ DOKLAD č.|Faktura - daňový doklad č.)\s+(?P<invoice_number>\d+)',
+        r'Variabilní symbol:?\s+(?P<variable_symbol>\S+)',
         r'Datum vystavení:\s+(?P<issue_day>\d+)\. (?P<issue_month>\d{1,2})\. (?P<issue_year>\d{4})',
         r'Datum splatnosti:\s+(?P<due_day>\d{1,2})\. (?P<due_month>\d{1,2})\. (?P<due_year>\d{4})',
         r'Datum uskutečnění plnění:\s+(?P<tax_day>\d{1,2})\. (?P<tax_month>\d{1,2})\. (?P<tax_year>\d{4})',
