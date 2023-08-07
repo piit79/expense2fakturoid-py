@@ -42,7 +42,7 @@ class ParserCPost(ParserBase):
         r'Kontakty\s+Hmotnost',
     ]
     REGEXES_LINE = (
-        (r'\d+\s+(?P<tracking>[RBACZ0-9]{13})\s+(?P<type>\S+)\s+(?P<customer_name>.+?)\s+'
+        (r'\d+\s+(?P<tracking>[A-Z]{2}\d{9}[A-Z]{2})\s+(?P<type>\S+)\s+(?P<customer_name>.+?)\s+'
          r'\d+\.\d+\s+(?P<unit_price>\d+\.\d+)'),
         r'^\s+(?P<service_code>\d+)\s*$',
         r'^\s+(?P<customer_email>\S+@\S+)\s*$',
