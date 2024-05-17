@@ -54,8 +54,8 @@ class ParserCPost(ParserBase):
     tracking_number: str
     posting_office: str
 
-    def __init__(self, filename, supplier_config: Optional[Dict] = None):
-        super().__init__(filename, supplier_config)
+    def __init__(self, filename, supplier_config: Optional[Dict] = None, debug: bool = False):
+        super().__init__(filename, supplier_config, debug)
         self.recipient_name = None
         self.recipient_email = None
         self.tracking_number = None

@@ -26,6 +26,8 @@ def get_args():
     parser.add_argument('--config', '-c', help='config file path')
     parser.add_argument('--supplier', '-s', help='supplier type', required=True, choices=Suppliers.get_valid_codes())
     parser.add_argument('--bank-account-id', '-b', help='bank account id', type=int)
+    parser.add_argument('--debug', '-d', action='store_true', help='output debug information, including the text version of the document')
+    parser.add_argument('--dry-run', '-n', action='store_true', help='do not actually create the expense in Fakturoid')
     parser.add_argument('filenames', nargs='+', help='supplier invoice/receipt filenames')
 
     return parser.parse_args()
@@ -96,9 +98,12 @@ def main():
     try:
         for filename in args.filenames:
             print(f'Importing {filename}')
-            e2fa = Expense2Fakturoid(config, args.supplier, filename, args.bank_account_id)
+            e2fa = Expense2Fakturoid(config, args.supplier, filename, args.bank_account_id, args.debug, args.dry_run)
             url = e2fa.run()
-            print(f'Expense imported successfully: {url}')
+            if (url):
+                print(f'Expense imported successfully: {url}')
+            else:
+                print(f'Expense not imported')
     except HTTPError as e:
         print(f'Error connecting to Fakturoid: {e}')
         sys.exit(4)

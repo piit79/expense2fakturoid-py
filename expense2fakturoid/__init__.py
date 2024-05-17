@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional, Type
+from pprint import pprint
 
 from fakturoid import Fakturoid, Expense, InvoiceLine, Subject
 
@@ -41,13 +42,17 @@ class Expense2Fakturoid:
             config: Dict[str, Any],
             supplier_code: str,
             filename: str,
-            bank_account_id: Optional[int] = None
+            bank_account_id: Optional[int] = None,
+            debug: bool = False,
+            dry_run: bool = False,
     ):
         self.fa = Fakturoid(config.get('slug'), config.get('email'), config.get('api_key'), self.APP_NAME)
         self.config = config
         self.supplier_code = supplier_code
         self.filename = filename
         self.bank_account_id = bank_account_id
+        self.debug = debug
+        self.dry_run = dry_run
         self.supplier_config = self.config.get(self.supplier_code, {})
         self.validate_supplier_config()
         self.subject = None
@@ -128,7 +133,7 @@ class Expense2Fakturoid:
         if not (parser_class := Suppliers.get_parser_class(self.supplier_code)):
             raise ValueError(f'Unknown supplier {self.supplier_code}')
 
-        self.parser = parser_class(self.filename, self.supplier_config)
+        self.parser = parser_class(self.filename, self.supplier_config, self.debug)
 
         supplier_email = self.parser.get_supplier_email()
         self.subject = self.find_subject(supplier_email)
@@ -139,9 +144,21 @@ class Expense2Fakturoid:
 
         parsed_data = self.parser.parse()
         data = self.get_expense_data(parsed_data)
-        expense = self.create_expense(data)
+        if self.debug:
+            print('Fakturoid data:')
+            dbg_data = data.copy()
+            if dbg_data['attachment']:
+                dbg_data['attachment'] = dbg_data['attachment'][:50] + '...'
+            dbg_data['lines'] = [vars(l) for l in dbg_data['lines']]
+            pprint(dbg_data)
+            print()
 
-        if self.parser.mark_paid:
-            self.mark_expense_paid(expense, paid_on=data['due_on'])
+        if not self.debug:
+            expense = self.create_expense(data)
 
-        return expense.html_url
+            if self.parser.mark_paid:
+                self.mark_expense_paid(expense, paid_on=data['due_on'])
+
+            return expense.html_url
+        else:
+            print('Not creating the expense (dry run)')

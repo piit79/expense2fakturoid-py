@@ -16,9 +16,10 @@ class ParserBase(ABC):
     DEFAULT_PAYMENT_METHOD = 'bank'
     MARK_PAID = False
 
-    def __init__(self, filename, supplier_config: Optional[Dict]):
+    def __init__(self, filename, supplier_config: Optional[Dict], debug: bool = False):
         self.filename = filename
         self.supplier_config = supplier_config
+        self.debug = debug
         self.lines = None
         self.invoice = {}
         self.read_file()
@@ -43,6 +44,11 @@ class ParserBase(ABC):
         with open(self.filename, 'rb') as f:
             pdf = pdftotext.PDF(f, physical=True)
             self.lines = '\n'.join(pdf).split('\n')
+            if self.debug:
+                print('Text representation of the PDF:')
+                print('<pdftotext-output>')
+                print('\n'.join(self.lines))
+                print('</pdftotext-output>\n')
 
     def get_attachment(self) -> str:
         """
