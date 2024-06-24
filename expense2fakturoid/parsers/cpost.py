@@ -39,7 +39,7 @@ class ParserCPost(ParserBase):
     REGEXES_HEADER = [
         (r'POŠTA:\s+(?P<post_office>.+?)\s+'
          r'DATUM PODÁNÍ:\s+(?P<issue_day>\d+)\.(?P<issue_month>\d{1,2})\.(?P<issue_year>\d{4})'),
-        r'Kontakty\s+Hmotnost',
+        r'Kontakty\s+Platební symboly\s+Hmotnost',
     ]
     REGEXES_LINE = (
         (r'\d+\s+(?P<tracking>[A-Z]{2}\d{9}[A-Z]{2})\s+(?P<type>\S+)\s+(?P<customer_name>.+?)\s+'
