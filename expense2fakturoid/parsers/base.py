@@ -24,6 +24,10 @@ class ParserBase(ABC):
         self.invoice = {}
         self.read_file()
 
+    def dprint(self, *args, **kwargs):
+        if self.debug:
+            print('DEBUG:', *args, **kwargs)
+
     @property
     def mark_paid(self) -> bool:
         """
