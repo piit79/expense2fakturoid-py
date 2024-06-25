@@ -115,26 +115,31 @@ class ParserCPost(ParserBase):
         data = {}
         regexi = iter(self.REGEXES_HEADER)
         regex = next(regexi)
+        self.dprint(f'Header regex: "{regex}"')
         lines_iter = iter(self.lines)
         try:
             while True:
                 line = next(lines_iter)
                 if match := re.search(regex, line):
+                    self.dprint(f'Match: {match.groupdict()}')
                     data.update(match.groupdict())
                     if not (regex := next(regexi, None)):
                         # This was the last regex
                         break
+                    self.dprint(f'Header regex: "{regex}"')
         except StopIteration:
             raise ParseError(f'Lines exhausted, regex not matched: {regex}')
 
         self.invoice = self.get_header(data)
         regexi = cycle(self.REGEXES_LINE)
         regex = next(regexi)
+        self.dprint(f'Line regex: "{regex}"')
         bill_line = {}
         try:
             while True:
                 line = next(lines_iter)
                 if match := re.search(regex, line):
+                    self.dprint(f'Match: {match.groupdict()}')
                     bill_line.update(match.groupdict())
                     if regex == self.REGEXES_LINE[-1]:
                         # This was the last line regex, add the invoice/receipt
@@ -147,6 +152,7 @@ class ParserCPost(ParserBase):
                             self.posting_office = data['post_office']
                         bill_line = {}
                     regex = next(regexi)
+                    self.dprint(f'Line regex: "{regex}"')
                 elif re.search(self.REGEX_STOP, line):
                     # Parsing complete
                     break
