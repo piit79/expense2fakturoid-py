@@ -11,7 +11,7 @@ by parsing the PDF invoices/bills.
 
 setup(
     name='expense2fakturoid',
-    version='1.1.4',
+    version='1.1.5',
     packages=['expense2fakturoid', 'expense2fakturoid.parsers'],
     url='https://github.com/piit79/expense2fakturoid-py',
     license='GPLv3',

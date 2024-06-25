@@ -43,8 +43,8 @@ class ParserCPost(ParserBase):
     ]
     REGEXES_LINE = (
         (r'\d+\s+(?P<tracking>[A-Z]{2}\d{9}[A-Z]{2})\s+(?P<type>\S+)\s+(?P<customer_name>.+?)\s+'
-         r'\d+\.\d+\s+(?P<unit_price>\d+\.\d+)'),
-        r'^\s+(?P<service_code>\d+)\s*$',
+         r'(?P<extra_services>[A-Z]{2}(?:, [A-Z]{2})*)?\s+(?P<cod>\d+\.\d+)\s+(?P<unit_price>\d+\.\d+)'),
+        r'^\s+(?P<service_code>\d+)\s+(?P<address1>.+?)\s{3,}(?P<shipment_value>\d+\.\d+)$',
         r'^\s+(?P<customer_email>\S+@\S+)\s*$',
     )
     REGEX_STOP = r'^\s*Celkem zásilek'
